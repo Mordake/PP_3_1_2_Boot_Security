@@ -47,7 +47,6 @@ public class WebSecurityConfig {
                         .permitAll()
                 )
                 .build();
-
     }
 
     @Bean
