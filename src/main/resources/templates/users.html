@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
+
+<!-- Кнопка Logout -->
+<form th:action="@{/logout}" method="post" style="float: right; margin: 10px 0;">
+    <button type="submit">Logout</button>
+</form>
+
 <h1>Users Management (Admin)</h1>
 
 <!-- Ошибка, если есть -->
@@ -16,12 +22,17 @@
 <!-- Форма добавления/редактирования -->
 <form th:action="@{/admin/add}" th:object="${user}" method="post" id="userForm">
     <input type="hidden" th:field="*{id}"/>
+
     <label for="name">Name:</label>
     <input type="text" th:field="*{name}" id="name" placeholder="Name" required/>
+
     <label for="email">Email:</label>
     <input type="email" th:field="*{email}" id="email" placeholder="Email" required/>
-    <label>Password:</label>
-    <input type="password" th:field="*{password}"/>
+
+    <label for="password">Password:</label>
+    <!-- при редактировании можно оставить пустым, чтобы не менять пароль -->
+    <input type="password" th:field="*{password}" id="password"
+           placeholder="Leave blank to keep current"/>
 
     <button type="submit">Add User</button>
 </form>
@@ -53,7 +64,10 @@
             <!-- Кнопка для удаления (запрос к /admin/delete) -->
             <form th:action="@{/admin/delete}" method="post" style="display:inline">
                 <input type="hidden" name="id" th:value="${userItem.id}"/>
-                <button type="submit" onclick="return confirm('Are you sure to delete this user?');">Delete</button>
+                <button type="submit"
+                        onclick="return confirm('Are you sure to delete this user?');">
+                    Delete
+                </button>
             </form>
         </td>
     </tr>
