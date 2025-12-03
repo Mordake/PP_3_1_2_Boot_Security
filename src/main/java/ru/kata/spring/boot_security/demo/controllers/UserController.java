@@ -24,12 +24,6 @@ public class UserController {
     }
 
 
-    @GetMapping("/admin")
-    public String adminPage(Principal principal, Model model) {
-        model.addAttribute("username", principal.getName());
-        return "admin";
-    }
-
     @GetMapping("/user")
     public String usersPage(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

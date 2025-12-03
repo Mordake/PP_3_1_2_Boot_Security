@@ -47,23 +47,19 @@ public class AdminUserController {
     }
 
     @PostMapping("/update")
-    public String updateUser(@Valid @ModelAttribute User user, BindingResult bindingResult, Model model) {
+    public String updateUser(@Valid @ModelAttribute User user,
+                             BindingResult bindingResult,
+                             Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("users", userService.findAll());
             return "users";
         }
-        User userUpdated = new User();
-        userUpdated.setId(user.getId());
-        userUpdated.setName(user.getName());
-        userUpdated.setEmail(user.getEmail());
-
-        if (user.getPassword() != null && !user.getPassword().isBlank()) {
-            userUpdated.setPassword(user.getPassword());
-        }
         try {
-            userService.update(userUpdated);
+            userService.update(user);
             return "redirect:/admin/users";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("users", userService.findAll());
             return "users";
         }
     }

@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.service;
 
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.User;
@@ -13,9 +14,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private  final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository,  PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -33,13 +36,27 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User save(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
     @Transactional
     @Override
     public User update(User user) {
-        return userRepository.save(user);
+        User existing = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        existing.setName(user.getName());
+        existing.setSurename(user.getSurename());
+        existing.setEmail(user.getEmail());
+        existing.setRoles(user.getRoles());
+
+        String rawPassword = user.getPassword();
+        if (rawPassword != null && !rawPassword.isEmpty() && !rawPassword.isBlank()) {
+            existing.setPassword(passwordEncoder.encode(rawPassword));
+        }
+
+        return userRepository.save(existing);
     }
 
     @Transactional
