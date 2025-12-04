@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<!-- Кнопка Logout -->
+<!-- Logout -->
 <form th:action="@{/logout}" method="post" style="float: right; margin: 10px 0;">
     <button type="submit">Logout</button>
 </form>
@@ -19,33 +19,46 @@
     <p th:text="${error}"></p>
 </div>
 
-<!-- Форма добавления/редактирования -->
+<!-- Форма добавления/редактирования как раньше -->
 <form th:action="@{/admin/add}" th:object="${user}" method="post" id="userForm">
     <input type="hidden" th:field="*{id}"/>
 
     <label for="name">Name:</label>
     <input type="text" th:field="*{name}" id="name" placeholder="Name" required/>
 
+    <label for="surename">Surname:</label>
+    <input type="text" th:field="*{surename}" id="surename" placeholder="Surname"/>
+
     <label for="email">Email:</label>
     <input type="email" th:field="*{email}" id="email" placeholder="Email" required/>
 
     <label for="password">Password:</label>
-    <!-- при редактировании можно оставить пустым, чтобы не менять пароль -->
     <input type="password" th:field="*{password}" id="password"
            placeholder="Leave blank to keep current"/>
 
-    <button type="submit">Add User</button>
+    <!-- NEW: выбор ролей, но в том же стиле -->
+    <label for="roles">Roles:</label>
+    <select th:field="*{roles}" id="roles" multiple size="2">
+        <option th:each="role : ${roles}"
+                th:value="${role.id}"
+                th:text="${#strings.substringAfter(role.name, 'ROLE_')}">
+        </option>
+    </select>
+
+    <button type="submit">Save User</button>
 </form>
 
 <hr/>
 
-<!-- Таблица пользователей -->
-<table border="1">
+<!-- Таблица пользователей как раньше, но с колонкой Roles -->
+<table border="1" cellpadding="4" cellspacing="0">
     <thead>
     <tr>
         <th>ID</th>
         <th>Name</th>
+        <th>Surname</th>
         <th>Email</th>
+        <th>Roles</th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -53,15 +66,19 @@
     <tr th:each="userItem : ${users}">
         <td th:text="${userItem.id}"></td>
         <td th:text="${userItem.name}"></td>
+        <td th:text="${userItem.surename}"></td>
         <td th:text="${userItem.email}"></td>
         <td>
-            <!-- Кнопка для редактирования (запрос к /admin/edit) -->
+            <span th:each="r : ${userItem.roles}"
+                  th:text="${#strings.substringAfter(r.name, 'ROLE_')}"
+                  style="margin-right:4px;"></span>
+        </td>
+        <td>
             <form th:action="@{/admin/edit}" method="post" style="display:inline">
                 <input type="hidden" name="id" th:value="${userItem.id}"/>
                 <button type="submit">Edit</button>
             </form>
 
-            <!-- Кнопка для удаления (запрос к /admin/delete) -->
             <form th:action="@{/admin/delete}" method="post" style="display:inline">
                 <input type="hidden" name="id" th:value="${userItem.id}"/>
                 <button type="submit"
